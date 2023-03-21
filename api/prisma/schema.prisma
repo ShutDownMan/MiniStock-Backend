@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Bairro {
+  idBairro   Int        @id @default(autoincrement())
+  nomeBairro String     @db.VarChar(45)
+  Endereco   Endereco[]
+}
+
+model Cliente {
+  codCliente          Int         @id @default(autoincrement())
+  nomeCliente         String      @db.VarChar(100)
+  cpf                 String      @db.VarChar(20)
+  cnpj                String      @db.VarChar(20)
+  isPessoaFisica      Int         @db.TinyInt
+  telefoneCliente     String      @db.VarChar(45)
+  Endereco_idEndereco Int
+  Endereco            Endereco    @relation(fields: [Endereco_idEndereco], references: [idEndereco], onDelete: NoAction, onUpdate: NoAction, map: "fk_Cliente_Endereco1")
+  NotaVenda           NotaVenda[]
+  Usuario             Usuario[]
+
+  @@index([Endereco_idEndereco], map: "fk_Cliente_Endereco1_idx")
+}
+
+model Endereco {
+  idEndereco              Int          @id @default(autoincrement())
+  cepEndereco             String       @db.VarChar(45)
+  Bairro_idBairro         Int
+  Municipio_idMunicipio   Int
+  Logradouro_idLogradouro Int
+  Cliente                 Cliente[]
+  Bairro                  Bairro       @relation(fields: [Bairro_idBairro], references: [idBairro], onDelete: NoAction, onUpdate: NoAction, map: "fk_Endereco_Bairro1")
+  Logradouro              Logradouro   @relation(fields: [Logradouro_idLogradouro], references: [idLogradouro], onDelete: NoAction, onUpdate: NoAction, map: "fk_Endereco_Logradouro1")
+  Municipio               Municipio    @relation(fields: [Municipio_idMunicipio], references: [idMunicipio], onDelete: NoAction, onUpdate: NoAction, map: "fk_Endereco_Municipio1")
+  Fornecedor              Fornecedor[]
+  NotaVenda               NotaVenda[]
+
+  @@index([Bairro_idBairro], map: "fk_Endereco_Bairro1_idx")
+  @@index([Logradouro_idLogradouro], map: "fk_Endereco_Logradouro1_idx")
+  @@index([Municipio_idMunicipio], map: "fk_Endereco_Municipio1_idx")
+}
+
+model Fornecedor {
+  codFornecedor       Int          @id @default(autoincrement())
+  nomeFornecedor      String       @db.VarChar(80)
+  cnpj                String       @db.VarChar(20)
+  nroEndereco         Int
+  Endereco_idEndereco Int
+  Endereco            Endereco     @relation(fields: [Endereco_idEndereco], references: [idEndereco], onDelete: NoAction, onUpdate: NoAction, map: "fk_Fornecedor_Endereco1")
+  NotaCompra          NotaCompra[]
+  Usuario             Usuario[]
+
+  @@index([Endereco_idEndereco], map: "fk_Fornecedor_Endereco1_idx")
+}
+
+model ItemCompra {
+  Produto_codProduto       Int
+  NotaCompra_nroNotaCompra Int
+  qtdItemCompra            Int
+  valorItemCompra          Float
+  NotaCompra               NotaCompra @relation(fields: [NotaCompra_nroNotaCompra], references: [nroNotaCompra], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_NotaCompra_NotaCompra1")
+  Produto                  Produto    @relation(fields: [Produto_codProduto], references: [codProduto], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_NotaCompra_Produto")
+
+  @@id([Produto_codProduto, NotaCompra_nroNotaCompra])
+  @@index([NotaCompra_nroNotaCompra], map: "fk_Produto_has_NotaCompra_NotaCompra1_idx")
+  @@index([Produto_codProduto], map: "fk_Produto_has_NotaCompra_Produto_idx")
+}
+
+model ItemVenda {
+  Produto_codProduto     Int
+  NotaVenda_nroNotaVenda Int
+  qtdItemVenda           Int
+  valorItemVenda         Float
+  NotaVenda              NotaVenda @relation(fields: [NotaVenda_nroNotaVenda], references: [nroNotaVenda], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_NotaVenda_NotaVenda1")
+  Produto                Produto   @relation(fields: [Produto_codProduto], references: [codProduto], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_NotaVenda_Produto1")
+
+  @@id([Produto_codProduto, NotaVenda_nroNotaVenda])
+  @@index([NotaVenda_nroNotaVenda], map: "fk_Produto_has_NotaVenda_NotaVenda1_idx")
+  @@index([Produto_codProduto], map: "fk_Produto_has_NotaVenda_Produto1_idx")
+}
+
+model Logradouro {
+  idLogradouro                    Int            @id @default(autoincrement())
+  nomeLogradouro                  String         @db.VarChar(45)
+  TipoLogradouro_idTipoLogradouro Int
+  Endereco                        Endereco[]
+  TipoLogradouro                  TipoLogradouro @relation(fields: [TipoLogradouro_idTipoLogradouro], references: [idTipoLogradouro], onDelete: NoAction, onUpdate: NoAction, map: "fk_Logradouro_TipoLogradouro1")
+
+  @@index([TipoLogradouro_idTipoLogradouro], map: "fk_Logradouro_TipoLogradouro1_idx")
+}
+
+model Municipio {
+  idMunicipio                           Int               @id @default(autoincrement())
+  nomeMunicipio                         String            @db.VarChar(45)
+  UnidadeFederativa_idUnidadeFederativa Int
+  Endereco                              Endereco[]
+  UnidadeFederativa                     UnidadeFederativa @relation(fields: [UnidadeFederativa_idUnidadeFederativa], references: [idUnidadeFederativa], onDelete: NoAction, onUpdate: NoAction, map: "fk_Municipio_UnidadeFederativa")
+
+  @@index([UnidadeFederativa_idUnidadeFederativa], map: "fk_Municipio_UnidadeFederativa_idx")
+}
+
+model NotaCompra {
+  nroNotaCompra            Int          @id @default(autoincrement())
+  dataCompra               DateTime     @db.Date
+  Fornecedor_codFornecedor Int
+  totalCompra              Float
+  descontoCompra           Float
+  valorLiquidoCompra       Float
+  ItemCompra               ItemCompra[]
+  Fornecedor               Fornecedor   @relation(fields: [Fornecedor_codFornecedor], references: [codFornecedor], onDelete: NoAction, onUpdate: NoAction, map: "fk_NotaCompra_Fornecedor1")
+
+  @@index([Fornecedor_codFornecedor], map: "fk_NotaCompra_Fornecedor1_idx")
+}
+
+model NotaVenda {
+  nroNotaVenda        Int         @id @default(autoincrement())
+  dataVenda           DateTime    @db.Date
+  Cliente_codCliente  Int
+  totalVenda          Float
+  descontoVenda       Float
+  valorLiquidoVenda   Float
+  isDinheiro          Int         @db.TinyInt
+  Endereco_idEndereco Int
+  ItemVenda           ItemVenda[]
+  Cliente             Cliente     @relation(fields: [Cliente_codCliente], references: [codCliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_NotaVenda_Cliente1")
+  Endereco            Endereco    @relation(fields: [Endereco_idEndereco], references: [idEndereco], onDelete: NoAction, onUpdate: NoAction, map: "fk_NotaVenda_Endereco1")
+
+  @@index([Cliente_codCliente], map: "fk_NotaVenda_Cliente1_idx")
+  @@index([Endereco_idEndereco], map: "fk_NotaVenda_Endereco1_idx")
+}
+
+model Produto {
+  codProduto              Int                       @id @default(autoincrement())
+  codigoBarras            String                    @db.VarChar(45)
+  nomeProduto             String                    @db.VarChar(80)
+  precoCusto              Float
+  precoVenda              Float
+  qtdAtualEstoque         Int
+  imagem                  String                    @db.VarChar(100)
+  dataCadastro            DateTime                  @db.Date
+  ItemCompra              ItemCompra[]
+  ItemVenda               ItemVenda[]
+  Produto_has_TipoProduto Produto_has_TipoProduto[]
+}
+
+model Produto_has_TipoProduto {
+  Produto_codProduto        Int
+  TipoProduto_idTipoProduto Int
+  Produto                   Produto     @relation(fields: [Produto_codProduto], references: [codProduto], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_TipoProduto_Produto1")
+  TipoProduto               TipoProduto @relation(fields: [TipoProduto_idTipoProduto], references: [idTipoProduto], onDelete: NoAction, onUpdate: NoAction, map: "fk_Produto_has_TipoProduto_TipoProduto1")
+
+  @@id([Produto_codProduto, TipoProduto_idTipoProduto])
+  @@index([Produto_codProduto], map: "fk_Produto_has_TipoProduto_Produto1_idx")
+  @@index([TipoProduto_idTipoProduto], map: "fk_Produto_has_TipoProduto_TipoProduto1_idx")
+}
+
+model TipoLogradouro {
+  idTipoLogradouro   Int          @id @default(autoincrement())
+  nomeTipoLogradouro String       @db.VarChar(45)
+  Logradouro         Logradouro[]
+}
+
+model TipoProduto {
+  idTipoProduto           Int                       @id @default(autoincrement())
+  nomeTipoProduto         String                    @db.VarChar(45)
+  Produto_has_TipoProduto Produto_has_TipoProduto[]
+}
+
+model UnidadeFederativa {
+  idUnidadeFederativa Int         @id @default(autoincrement())
+  siglaUF             String      @db.VarChar(2)
+  nomeUF              String      @db.VarChar(45)
+  Municipio           Municipio[]
+}
+
+model Usuario {
+  idUsuario      Int      @id @default(autoincrement())
+  nomeUsuario    String   @db.VarChar(45)
+  emailUsuario   String   @db.VarChar(45)
+  senhaUsuario   String   @db.VarChar(45)
+  isAdm       Int      @db.TinyInt
+  isAtivo     Int      @db.TinyInt
+  isLogado    Int      @db.TinyInt
+  isPrimeiroAcesso Int @db.TinyInt
+  Cliente     Cliente[]
+  Fornecedor  Fornecedor[]
+}

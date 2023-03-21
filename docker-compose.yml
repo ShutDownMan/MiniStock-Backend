@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  database:
+    container_name: database
+    image: mariadb:10.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  api:
+    container_name: api
+    build: ./api
+    restart: always
+    environment:
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE}"
+      API_PORT: 8080
+    ports:
+      - "${API_PORT}:8080"
+    depends_on:
+      - database
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
