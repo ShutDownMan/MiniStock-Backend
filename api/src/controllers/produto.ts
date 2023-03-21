@@ -5,6 +5,11 @@ import { validate } from 'class-validator';
 
 export default class ProdutoController {
 
+    /**
+     * Create a new produto with bogus data
+     * @param req 
+     * @param res 
+     */
     public static async imagineProduto(req: Request, res: Response) {
         // create new produto using the service
         try {
@@ -16,6 +21,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Get a produto by id
+     * @param req 
+     * @param res 
+     */
     public static async getProdutoById(req: Request, res: Response) {
         try {
             const id = parseInt(req.params.id);
@@ -26,6 +36,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Get all produtos
+     * @param req 
+     * @param res 
+     */
     public static async getAllProdutos(req: Request, res: Response) {
         try {
             const produtos = await ProdutoService.getAllProdutos();
@@ -35,6 +50,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Create a new produto
+     * @param req 
+     * @param res 
+     */
     public static async createProduto(req: Request, res: Response) {
         try {
             const produto = req.body;
@@ -45,6 +65,12 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Update a produto
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     public static async updateProduto(req: Request, res: Response) {
         try {
             const produto: ProdutoUpdateModel = {
@@ -65,6 +91,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Delete a produto
+     * @param req 
+     * @param res 
+     */
     public static async deleteProduto(req: Request, res: Response) {
         try {
             const id = parseInt(req.params.id);
@@ -75,6 +106,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Get a produto by nome
+     * @param req 
+     * @param res 
+     */
     public static async getProdutoByNome(req: Request, res: Response) {
         try {
             const { nome, limit, offset } = req.params;
@@ -85,6 +121,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Get all tipos
+     * @param req 
+     * @param res 
+     */
     public static async getAllTipos(req: Request, res: Response) {
         try {
             const tipos = await ProdutoService.getAllTipos();
@@ -94,6 +135,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Push a tipo to a produto's list of tipos
+     * @param req 
+     * @param res 
+     */
     public static async pushTipoProduto(req: Request, res: Response) {
         try {
             const { produtoid, tipoid } = req.params;
@@ -104,6 +150,11 @@ export default class ProdutoController {
         }
     }
 
+    /**
+     * Delete a tipo from a produto's list of tipos
+     * @param req 
+     * @param res 
+     */
     public static async deleteTipoProduto(req: Request, res: Response) {
         try {
             const { produtoid, tipoid } = req.params;
