@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { randAlpha, randFood, randNumber, randRecentDate, randUrl } from '@ngneat/falso'
+import { ProdutoUpdateModel } from '../models/produto';
 
 export default class ProdutoService {
     public static async imagineProduto(produto: any) {
@@ -70,7 +71,7 @@ export default class ProdutoService {
         return newProduto;
     }
 
-    public static async updateProduto(produto: any) {
+    public static async updateProduto(produto: ProdutoUpdateModel) {
         if (produto.codProduto === undefined) {
             throw new Error('codProduto is required');
         }
@@ -120,5 +121,65 @@ export default class ProdutoService {
     public static async getAllTipos() {
         const tipos = await prisma.tipoProduto.findMany();
         return tipos;
+    }
+
+    public static async pushTipoProduto(produtoid: number, tipoid: number) {
+        // check if the product already has this type
+        const produto_has_TipoProduto = await prisma.produto_has_TipoProduto.findUnique({
+            where: {
+                Produto_codProduto_TipoProduto_idTipoProduto: {
+                    Produto_codProduto: produtoid,
+                    TipoProduto_idTipoProduto: tipoid,
+                }
+            }
+        });
+
+        if (produto_has_TipoProduto) {
+            throw new Error('Produto já possui este tipo');
+        }
+
+        const produto = await prisma.produto_has_TipoProduto.create({
+            data: {
+                Produto_codProduto: produtoid,
+                TipoProduto_idTipoProduto: tipoid,
+            },
+            include: {
+                Produto: {
+                    select: {
+                        Produto_has_TipoProduto: {
+                            include: {
+                                TipoProduto: true,
+                            }
+                        }
+                    }
+                },
+            }
+        });
+
+        return produto.Produto;
+    }
+
+    public static async deleteTipoProduto(produtoid: number, tipoid: number) {
+        const produto = await prisma.produto_has_TipoProduto.delete({
+            where: {
+                Produto_codProduto_TipoProduto_idTipoProduto: {
+                    Produto_codProduto: produtoid,
+                    TipoProduto_idTipoProduto: tipoid,
+                }
+            },
+            include: {
+                Produto: {
+                    include: {
+                        Produto_has_TipoProduto: {
+                            include: {
+                                TipoProduto: true,
+                            }
+                        }
+                    }
+                },
+            }
+        });
+
+        return produto.Produto;
     }
 }

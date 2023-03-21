@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import ProdutoService from '../services/produto';
-import { Produto } from '../models/produto';
+import { ProdutoUpdateModel } from '../models/produto';
+import { validate } from 'class-validator';
 
 export default class ProdutoController {
 
@@ -46,7 +47,17 @@ export default class ProdutoController {
 
     public static async updateProduto(req: Request, res: Response) {
         try {
-            const produto = req.body;
+            const produto: ProdutoUpdateModel = {
+                codProduto: parseInt(req.params.id),
+                ...req.body,
+            }
+
+            const errors = await validate(produto);
+            if (errors.length > 0) {
+                res.status(400).send(errors);
+                return;
+            }
+
             const updatedProduto = await ProdutoService.updateProduto(produto);
             res.send(updatedProduto);
         } catch (err: any) {
@@ -78,6 +89,26 @@ export default class ProdutoController {
         try {
             const tipos = await ProdutoService.getAllTipos();
             res.send(tipos);
+        } catch (err: any) {
+            res.status(500).send(err.message || "Internal Server Error");
+        }
+    }
+
+    public static async pushTipoProduto(req: Request, res: Response) {
+        try {
+            const { produtoid, tipoid } = req.params;
+            const produto = await ProdutoService.pushTipoProduto(parseInt(produtoid), parseInt(tipoid));
+            res.send(produto);
+        } catch (err: any) {
+            res.status(500).send(err.message || "Internal Server Error");
+        }
+    }
+
+    public static async deleteTipoProduto(req: Request, res: Response) {
+        try {
+            const { produtoid, tipoid } = req.params;
+            await ProdutoService.deleteTipoProduto(parseInt(produtoid), parseInt(tipoid));
+            res.status(204).send();
         } catch (err: any) {
             res.status(500).send(err.message || "Internal Server Error");
         }

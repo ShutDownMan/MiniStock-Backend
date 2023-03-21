@@ -9,6 +9,8 @@ if (process.env.NODE_ENV !== 'production') {
 const app: Express = express()
 const port = process.env.API_PORT
 
+app.use(express.json())
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server')
 })

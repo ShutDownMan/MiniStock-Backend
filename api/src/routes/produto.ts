@@ -13,5 +13,7 @@ router.post('/imagine', ProdutoController.imagineProduto)
 router.get('/find/:nome', ProdutoController.getProdutoByNome)
 
 router.get('/tipo/list', ProdutoController.getAllTipos)
+router.put('/:produtoid/push-tipo/:tipoid', ProdutoController.pushTipoProduto)
+router.delete('/:produtoid/pop-tipo/:tipoid', ProdutoController.deleteTipoProduto)
 
 module.exports = router

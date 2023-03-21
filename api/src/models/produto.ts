@@ -1,35 +1,40 @@
+import { Produto } from '@prisma/client';
 import { IsString, MaxLength, MinLength } from 'class-validator';
+import { type } from 'os';
 
-export class Produto {
-    @IsString()
-    @MinLength(1)
-    @MaxLength(45)
-    codigoBarras: string;
+export class ProdutoCreateModel implements Pick<Produto, 'nomeProduto' | 'precoCusto' | 'precoVenda' | 'qtdAtualEstoque' | 'imagem' | 'dataCadastro'> {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(45)
+  codigoBarras: string;
 
-    @IsString()
-    @MinLength(1)
-    @MaxLength(80)
-    nomeProduto: string;
+  @IsString()
+  @MinLength(1)
+  @MaxLength(80)
+  nomeProduto: string;
 
-    precoCusto: number;
+  precoCusto: number;
 
-    precoVenda: number;
+  precoVenda: number;
 
-    qtdAtualEstoque: number;
+  qtdAtualEstoque: number;
 
-    @IsString()
-    @MinLength(1)
-    @MaxLength(100)
-    imagem: string;
+  @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  imagem: string;
 
-    dataCadastro: Date;
+  dataCadastro: Date;
 
-    ItemCompra: ItemCompra[];
+  ItemCompra?: ItemCompra[];
 
-    ItemVenda: ItemVenda[];
+  ItemVenda?: ItemVenda[];
 
-    TipoProduto: TipoProduto[];
+  TipoProduto?: TipoProduto[];
 }
+
+// codProduto required, rest is optional
+export type ProdutoUpdateModel = Pick<Produto, 'codProduto'>;
 
 export class ItemCompra {
   Produto_codProduto: number;
@@ -42,7 +47,7 @@ export class ItemCompra {
 
   // NotaCompra: NotaCompra;
 
-  Produto: Produto;
+  Produto?: Produto;
 }
 
 export class ItemVenda {
@@ -56,7 +61,7 @@ export class ItemVenda {
 
   // NotaVenda: NotaVenda;
 
-  Produto: Produto;
+  Produto?: Produto;
 }
 
 export class TipoProduto {
@@ -64,6 +69,6 @@ export class TipoProduto {
 
   nomeTipoProduto: string;
 
-  Produto: Produto[];
+  Produto?: Produto[];
 }
 
