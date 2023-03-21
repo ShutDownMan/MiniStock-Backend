@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -174,7 +175,7 @@ model TipoProduto {
 
 model UnidadeFederativa {
   idUnidadeFederativa Int         @id @default(autoincrement())
-  siglaUF             String      @db.VarChar(2)
+  siglaUF             String      @db.VarChar(5)
   nomeUF              String      @db.VarChar(45)
   Municipio           Municipio[]
 }

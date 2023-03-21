@@ -14,12 +14,15 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 // usuario router
-require('./routes/usuario')
+// require('./routes/usuario')
 
 // Produto router
-require('./routes/produto')
+let produtoRouter = require('./routes/produto')
+app.use('/api/produto', produtoRouter)
 
-// 
+// Compra router
+let compraRouter = require('./routes/nota-compra')
+app.use('/api/nota-compra', compraRouter)
 
 // open swagger.json file
 const options = require('./swagger')["default"]
