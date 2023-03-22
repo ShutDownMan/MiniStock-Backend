@@ -15,7 +15,7 @@ export class NotaCompraCreateModel implements Pick<NotaCompra, 'dataCompra' | 'F
     ItemCompra?: ItemCompra[];
 }
 
-// codNotaCompra required, rest is optional
+// nroNotaCompra required, rest is optional
 export type NotaCompraUpdateModel = Pick<NotaCompra, 'nroNotaCompra'>;
 
 export class ItemCompra {

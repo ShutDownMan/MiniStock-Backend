@@ -118,7 +118,7 @@ export default class NotaCompraService {
 
     public static async updateCompra(notaCompra: NotaCompraUpdateModel) {
         if (notaCompra.nroNotaCompra === undefined) {
-            throw new Error('codCompra is required');
+            throw new Error('nroNotaCompra is required');
         }
 
         const updatedCompra = await prisma.notaCompra.update({
@@ -126,13 +126,21 @@ export default class NotaCompraService {
                 nroNotaCompra: notaCompra.nroNotaCompra,
             },
             data: notaCompra,
+            include: {
+                ItemCompra: {
+                    include: {
+                        Produto: true,
+                    },
+                },
+                Fornecedor: true,
+            }
         });
         return updatedCompra;
     }
 
     public static async deleteNotaCompra(id: number) {
         if (id === undefined) {
-            throw new Error('codCompra is required');
+            throw new Error('nroNotaCompra is required');
         }
 
         await prisma.notaCompra.delete({
@@ -140,5 +148,101 @@ export default class NotaCompraService {
                 nroNotaCompra: id,
             },
         });
+    }
+
+    public static async getAllItemComprasFromNotaCompra(nroNotaCompra: number) {
+        const compra = await prisma.notaCompra.findUnique({
+            where: {
+                nroNotaCompra: nroNotaCompra,
+            },
+            include: {
+                ItemCompra: {
+                    include: {
+                        Produto: true,
+                    },
+                },
+                Fornecedor: true,
+            }
+        });
+
+        return compra?.ItemCompra;
+    }
+
+    public static async pushItemCompra(itemCompra: any) {
+        // check if item already on list
+        const notaCompra = await prisma.notaCompra.findUnique({
+            where: {
+                nroNotaCompra: itemCompra.nroNotaCompra,
+            },
+            include: {
+                ItemCompra: {
+                    include: {
+                        Produto: true,
+                    },
+                },
+                Fornecedor: true,
+            }
+        });
+
+        if (!notaCompra) {
+            throw new Error('Compra not found');
+        }
+
+        if (notaCompra?.ItemCompra?.some(item => item.Produto_codProduto === itemCompra.Produto_codProduto)) {
+            return notaCompra;
+        }
+
+        const nroNotaCompra = itemCompra.nroNotaCompra;
+        itemCompra.nroNotaCompra = undefined;
+
+        // add item to list
+        const newCompra = await prisma.notaCompra.update({
+            where: {
+                nroNotaCompra: nroNotaCompra,
+            },
+            data: {
+                ItemCompra: {
+                    create: {
+                        ...itemCompra,
+                    }
+                }
+            },
+            include: {
+                ItemCompra: {
+                    include: {
+                        Produto: true,
+                    },
+                },
+                Fornecedor: true,
+            }
+        });
+
+        return newCompra;
+    }
+
+    public static async deleteItemCompra(itemCompra: any) {
+        // remove item from list
+        const newCompra = await prisma.notaCompra.update({
+            where: {
+                nroNotaCompra: itemCompra.nroNotaCompra,
+            },
+            data: {
+                ItemCompra: {
+                    deleteMany: {
+                        Produto_codProduto: itemCompra.Produto_codProduto,
+                    }
+                }
+            },
+            include: {
+                ItemCompra: {
+                    include: {
+                        Produto: true,
+                    },
+                },
+                Fornecedor: true,
+            }
+        });
+
+        return newCompra;
     }
 }
