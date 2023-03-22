@@ -29,12 +29,14 @@ async function createUsuarios() {
     await prisma.usuario.createMany({
         data: [
             {
+                idUsuario: 1,
                 nomeUsuario: 'John Doe',
                 emailUsuario: 'teste@exemplo.com',
                 hashSenha: AuthService.hashPassword('senha-teste', 10),
                 TipoUsuario_idTipoUsuario: 1,
             },
             {
+                idUsuario: 2,
                 nomeUsuario: 'João do Estoque',
                 emailUsuario: 'john_stock@exemplo.com',
                 hashSenha: AuthService.hashPassword('123456john', 10),
@@ -266,8 +268,9 @@ async function createFornecedores() {
 
 async function main() {
     try {
-        await prisma.tipoUsuario.deleteMany({})
+        await prisma.token.deleteMany({})
         await prisma.usuario.deleteMany({})
+        await prisma.tipoUsuario.deleteMany({})
         await prisma.itemCompra.deleteMany({})
         await prisma.notaCompra.deleteMany({})
         await prisma.fornecedor.deleteMany({})
