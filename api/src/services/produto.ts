@@ -1,6 +1,6 @@
 import prisma from '../prisma';
 import { randAlpha, randFood, randNumber, randRecentDate, randUrl } from '@ngneat/falso'
-import { ProdutoUpdateModel } from '../models/produto';
+import { ProdutoCreateModel, ProdutoUpdateModel } from '../models/produto';
 
 export default class ProdutoService {
     public static async imagineProduto(produto: any) {
@@ -66,9 +66,27 @@ export default class ProdutoService {
         return produtos;
     }
 
-    public static async createProduto(produto: any) {
+    public static async createProduto(produto: ProdutoCreateModel) {
+        const tiposToCreate = produto.TipoProduto?.map(tipo => ({
+            TipoProduto_idTipoProduto: tipo.idTipoProduto,
+        }));
+
+        delete produto.TipoProduto;
+        const produtoOmitted: Omit<ProdutoCreateModel, 'TipoProduto'> = {
+            ...produto,
+        }
+
         const newProduto = await prisma.produto.create({
-            data: produto,
+            data: {
+                ...produtoOmitted,
+                ...(tiposToCreate && {
+                    Produto_has_TipoProduto: {
+                        createMany: {
+                            data: tiposToCreate,
+                        },
+                    },
+                })
+            },
         });
         return newProduto;
     }
@@ -172,26 +190,15 @@ export default class ProdutoService {
     }
 
     public static async deleteTipoProduto(produtoid: number, tipoid: number) {
-        const produto = await prisma.produto_has_TipoProduto.delete({
+        const tipoProduto = await prisma.produto_has_TipoProduto.delete({
             where: {
                 Produto_codProduto_TipoProduto_idTipoProduto: {
                     Produto_codProduto: produtoid,
                     TipoProduto_idTipoProduto: tipoid,
                 }
-            },
-            include: {
-                Produto: {
-                    include: {
-                        Produto_has_TipoProduto: {
-                            include: {
-                                TipoProduto: true,
-                            }
-                        }
-                    }
-                },
             }
         });
 
-        return produto.Produto;
+        return tipoProduto;
     }
 }

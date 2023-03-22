@@ -42,4 +42,3 @@ export class TipoProduto {
 
   Produto?: Produto[];
 }
-

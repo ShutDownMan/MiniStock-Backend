@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import ProdutoService from '../services/produto';
-import { ProdutoUpdateModel } from '../models/produto';
+import { ProdutoCreateModel, ProdutoUpdateModel } from '../models/produto';
 import { validate } from 'class-validator';
 
 export default class ProdutoController {
@@ -57,7 +57,8 @@ export default class ProdutoController {
      */
     public static async createProduto(req: Request, res: Response) {
         try {
-            const produto = req.body;
+            const produto: ProdutoCreateModel = req.body;
+
             const newProduto = await ProdutoService.createProduto(produto);
             res.send(newProduto);
         } catch (err: any) {
@@ -158,8 +159,8 @@ export default class ProdutoController {
     public static async deleteTipoProduto(req: Request, res: Response) {
         try {
             const { produtoid, tipoid } = req.params;
-            await ProdutoService.deleteTipoProduto(parseInt(produtoid), parseInt(tipoid));
-            res.status(204).send();
+            const produto = await ProdutoService.deleteTipoProduto(parseInt(produtoid), parseInt(tipoid));
+            res.status(204).send(produto);
         } catch (err: any) {
             res.status(500).send(err.message || "Internal Server Error");
         }

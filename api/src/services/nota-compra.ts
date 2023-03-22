@@ -96,6 +96,7 @@ export default class NotaCompraService {
             valorItemCompra: item.valorItemCompra,
         }));
 
+        delete notaCompra.ItemCompra;
         const notaCompraOmitted: Omit<NotaCompraCreateModel, 'ItemCompra'> = {
             ...notaCompra,
         }
