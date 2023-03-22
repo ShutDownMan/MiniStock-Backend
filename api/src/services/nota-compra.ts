@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { randAlpha, randFood, randNumber, randRecentDate } from '@ngneat/falso'
+import { NotaCompraCreateModel, NotaCompraUpdateModel } from '../models/nota-compra';
 
 export default class NotaCompraService {
     public static async imagineNotaCompra(compra: any) {
@@ -25,7 +26,7 @@ export default class NotaCompraService {
             },
         });
 
-        const descontoCompra = randNumber({ min: 1, max: 100 })/100;
+        const descontoCompra = randNumber({ min: 1, max: 100 }) / 100;
         const newNotaCompra = {
             dataCompra: randRecentDate({ days: 10 }),
             totalCompra: itensCompra.reduce((acc, item) => acc + item.qtdItemCompra * item.valorItemCompra, 0),
@@ -88,15 +89,35 @@ export default class NotaCompraService {
         return compras;
     }
 
-    public static async createNotaCompra(notaCompra: any) {
+    public static async createNotaCompra(notaCompra: NotaCompraCreateModel) {
+        let itemsToCreate = notaCompra.ItemCompra?.map(item => ({
+            Produto_codProduto: item.Produto_codProduto,
+            qtdItemCompra: item.qtdItemCompra,
+            valorItemCompra: item.valorItemCompra,
+        }));
+
+        const notaCompraOmitted: Omit<NotaCompraCreateModel, 'ItemCompra'> = {
+            ...notaCompra,
+        }
+
         const newNotaCompra = await prisma.notaCompra.create({
-            data: notaCompra,
+            data: {
+                ...notaCompraOmitted,
+                ...(itemsToCreate && {
+                    ItemCompra: {
+                        createMany: {
+                            data: itemsToCreate,
+                        }
+                    }
+                })
+            }
         });
+
         return newNotaCompra;
     }
 
-    public static async updateCompra(notaCompra: any) {
-        if (notaCompra.codCompra === undefined) {
+    public static async updateCompra(notaCompra: NotaCompraUpdateModel) {
+        if (notaCompra.nroNotaCompra === undefined) {
             throw new Error('codCompra is required');
         }
 
