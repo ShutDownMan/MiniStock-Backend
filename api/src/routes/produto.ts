@@ -3,6 +3,10 @@ import ProdutoController from '../controllers/produto'
 
 let router = express.Router()
 
+router.get('/tipo/list', ProdutoController.getAllTipos)
+router.put('/:produtoid/push-tipo/:tipoid', ProdutoController.pushTipoProduto)
+router.delete('/:produtoid/pull-tipo/:tipoid', ProdutoController.deleteTipoProduto)
+
 router.get('/list', ProdutoController.getAllProdutos)
 router.get('/:id', ProdutoController.getProdutoById)
 router.post('/', ProdutoController.createProduto)
@@ -11,9 +15,5 @@ router.delete('/:id', ProdutoController.deleteProduto)
 router.post('/imagine', ProdutoController.imagineProduto)
 
 router.get('/find/:nome', ProdutoController.getProdutoByNome)
-
-router.get('/tipo/list', ProdutoController.getAllTipos)
-router.put('/:produtoid/push-tipo/:tipoid', ProdutoController.pushTipoProduto)
-router.delete('/:produtoid/pop-tipo/:tipoid', ProdutoController.deleteTipoProduto)
 
 module.exports = router

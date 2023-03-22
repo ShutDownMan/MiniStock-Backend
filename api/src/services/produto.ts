@@ -132,11 +132,22 @@ export default class ProdutoService {
                     Produto_codProduto: produtoid,
                     TipoProduto_idTipoProduto: tipoid,
                 }
+            },
+            include: {
+                Produto: {
+                    select: {
+                        Produto_has_TipoProduto: {
+                            include: {
+                                TipoProduto: true,
+                            }
+                        }
+                    }
+                },
             }
         });
 
         if (produto_has_TipoProduto) {
-            throw new Error('Produto já possui este tipo');
+            return produto_has_TipoProduto.Produto;
         }
 
         const produto = await prisma.produto_has_TipoProduto.create({
