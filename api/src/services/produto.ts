@@ -5,6 +5,8 @@ import { ProdutoUpdateModel } from '../models/produto';
 export default class ProdutoService {
     public static async imagineProduto(produto: any) {
 
+        const numOfTipoProdutos = await prisma.tipoProduto.count();
+
         // imagine attributes
         const newProduto = {
             codigoBarras: randAlpha({ length: 45 }).join(''),
@@ -28,7 +30,7 @@ export default class ProdutoService {
         await prisma.produto_has_TipoProduto.create({
             data: {
                 Produto_codProduto: createdProduto.codProduto,
-                TipoProduto_idTipoProduto: 1 //randNumber({ min: 1, max: 4 }),
+                TipoProduto_idTipoProduto: randNumber({ min: 1, max: numOfTipoProdutos }),
             }
         });
 
@@ -98,7 +100,6 @@ export default class ProdutoService {
     }
 
     public static async getProdutoByNome(nomeProduto: string, limit: number = 10, offset: number = 0) {
-        // fuzzy search
         const produtos = await prisma.produto.findMany({
             where: {
                 nomeProduto: {

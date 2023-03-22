@@ -16,7 +16,12 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 // usuario router
-// require('./routes/usuario')
+let usuarioRouter = require('./routes/usuario')
+app.use('/api/usuario', usuarioRouter)
+
+// auth router
+let authRouter = require('./routes/auth')
+app.use('/api/auth', authRouter)
 
 // Produto router
 let produtoRouter = require('./routes/produto')
@@ -38,3 +43,5 @@ app.use(
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`)
 })
+
+// bash one-liner to count sloc: find ./src -name '*.ts' | xargs wc -l

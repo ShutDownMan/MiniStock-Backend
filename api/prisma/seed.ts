@@ -1,19 +1,50 @@
 import { PrismaClient } from '@prisma/client'
 import { randNumber, randRecentDate } from '@ngneat/falso'
+import AuthService from '../src/services/auth';
 
 const prisma = new PrismaClient()
 
+async function createUsuarios() {
+    await prisma.tipoUsuario.createMany({
+        data: [
+            {
+                idTipoUsuario: 1,
+                nomeTipoUsuario: 'Administrador',
+            },
+            {
+                idTipoUsuario: 2,
+                nomeTipoUsuario: 'Gestor de Estoque',
+            },
+            {
+                idTipoUsuario: 3,
+                nomeTipoUsuario: 'Gestor de Vendas',
+            },
+            {
+                idTipoUsuario: 4,
+                nomeTipoUsuario: 'Vendedor',
+            },
+        ]
+    });
+
+    await prisma.usuario.createMany({
+        data: [
+            {
+                nomeUsuario: 'John Doe',
+                emailUsuario: 'teste@exemplo.com',
+                hashSenha: AuthService.hashPassword('senha-teste', 10),
+                TipoUsuario_idTipoUsuario: 1,
+            },
+            {
+                nomeUsuario: 'João do Estoque',
+                emailUsuario: 'john_stock@exemplo.com',
+                hashSenha: AuthService.hashPassword('123456john', 10),
+                TipoUsuario_idTipoUsuario: 2,
+            },
+        ]
+    })
+}
+
 async function createProdutos() {
-    // return await prisma.produto.create({
-    //     data: {
-    //         codProduto: 1,
-    //         nomeProduto: 'Produto 1',
-    //         qtdAtualEstoque: 10,
-    //         precoCusto: 150,
-    //         precoVenda: 200,
-    //         dataCadastro: new Date(),
-    //     },
-    // })
 
     await prisma.tipoProduto.createMany({
         data: [
@@ -235,6 +266,8 @@ async function createFornecedores() {
 
 async function main() {
     try {
+        await prisma.tipoUsuario.deleteMany({})
+        await prisma.usuario.deleteMany({})
         await prisma.itemCompra.deleteMany({})
         await prisma.notaCompra.deleteMany({})
         await prisma.fornecedor.deleteMany({})
@@ -248,6 +281,7 @@ async function main() {
         console.log("error: ", error)
     }
 
+    await createUsuarios()
     await createProdutos()
     await createEnderecos()
     await createFornecedores()

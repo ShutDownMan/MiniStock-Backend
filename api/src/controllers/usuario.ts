@@ -20,4 +20,14 @@ export class UsuarioController {
             res.status(500).send(err.message || "Internal Server Error");
         }
     }
+
+    public static async getUsuarioLogado(req: Request, res: Response) {
+        try {
+            const { token } = req.body;
+            const usuario = await UsuarioService.getUsuarioLogado(token);
+            res.send(usuario);
+        } catch (err: any) {
+            res.status(500).send(err.message || "Internal Server Error");
+        }
+    }
 }

@@ -3,7 +3,9 @@ import { UsuarioController } from '../controllers/usuario';
 
 let router = express.Router()
 
-router.get('/api/usuario', UsuarioController.getAllUsuarios);
-router.get('/api/usuario/:id', UsuarioController.getUsuarioById);
+router.get('/', UsuarioController.getAllUsuarios);
+router.get('/:id', UsuarioController.getUsuarioById);
+
+router.post('/me', UsuarioController.getUsuarioLogado);
 
 module.exports = router

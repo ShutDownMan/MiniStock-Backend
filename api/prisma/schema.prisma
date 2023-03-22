@@ -24,7 +24,6 @@ model Cliente {
   Endereco_idEndereco Int
   Endereco            Endereco    @relation(fields: [Endereco_idEndereco], references: [idEndereco], onDelete: NoAction, onUpdate: NoAction, map: "fk_Cliente_Endereco1")
   NotaVenda           NotaVenda[]
-  Usuario             Usuario[]
 
   @@index([Endereco_idEndereco], map: "fk_Cliente_Endereco1_idx")
 }
@@ -55,7 +54,6 @@ model Fornecedor {
   Endereco_idEndereco Int
   Endereco            Endereco     @relation(fields: [Endereco_idEndereco], references: [idEndereco], onDelete: NoAction, onUpdate: NoAction, map: "fk_Fornecedor_Endereco1")
   NotaCompra          NotaCompra[]
-  Usuario             Usuario[]
 
   @@index([Endereco_idEndereco], map: "fk_Fornecedor_Endereco1_idx")
 }
@@ -181,14 +179,26 @@ model UnidadeFederativa {
 }
 
 model Usuario {
-  idUsuario      Int      @id @default(autoincrement())
-  nomeUsuario    String   @db.VarChar(45)
-  emailUsuario   String   @db.VarChar(45)
-  senhaUsuario   String   @db.VarChar(45)
-  isAdm       Int      @db.TinyInt
-  isAtivo     Int      @db.TinyInt
-  isLogado    Int      @db.TinyInt
-  isPrimeiroAcesso Int @db.TinyInt
-  Cliente     Cliente[]
-  Fornecedor  Fornecedor[]
+  idUsuario      Int        @id @default(autoincrement())
+  nomeUsuario    String     @db.VarChar(45)
+  emailUsuario   String     @db.VarChar(45) @unique
+  hashSenha      String     @db.VarChar(64)
+  TipoUsuario_idTipoUsuario Int
+  TipoUsuario     TipoUsuario @relation(fields: [TipoUsuario_idTipoUsuario], references: [idTipoUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_Usuario_TipoUsuario1")
+  Token           Token[]
+}
+
+model TipoUsuario {
+  idTipoUsuario   Int    @id @default(autoincrement())
+  nomeTipoUsuario String @db.VarChar(45)
+  Usuario         Usuario[]
+}
+
+model Token {
+  idToken           Int       @id @default(autoincrement())
+  token             String    @db.VarChar(45) @unique
+  expiration        DateTime  @db.Date
+  expirado          Int       @db.TinyInt
+  Usuario_idUsuario Int
+  Usuario           Usuario   @relation(fields: [Usuario_idUsuario], references: [idUsuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_Token_Usuario1")
 }
