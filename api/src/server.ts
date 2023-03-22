@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from 'express'
+import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
 
@@ -10,6 +11,7 @@ const app: Express = express()
 const port = process.env.API_PORT
 
 app.use(express.json())
+app.use(cors())
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server')
